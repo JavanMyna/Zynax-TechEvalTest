@@ -24,32 +24,6 @@ Welcome, and thanks for taking the time to look through this. If you have five m
 ## What it is
 
 A single-screen imitation of daily.dev's feed page:
-# Zynax — CSS Technical Evaluation
-
-A front-end recreation of the [daily.dev](https://daily.dev) dashboard, built for the
-Computer Science Society (USM) technical evaluation.
-
-**Live demo:** https://zynax-eval.mynko.workers.dev
-
-Reference that the build was matched against: [`imageRef.png`](./imageRef.png).
-
----
-
-## Start here
-
-Welcome, and thanks for taking the time to look through this. If you have five minutes:
-
-1. Open the live demo.
-2. Resize the window from desktop to phone width — the layout collapses deliberately
-   (top-bar icons, sidebar, and the two-column grid drop out at their breakpoints).
-3. Compare it against `imageRef.png`; the goal was visual fidelity to the reference,
-   not a new design.
-4. Read the **How this was built** section below. It is honest about AI use, because
-   I would rather you judge the work with the full picture.
-
-## What it is
-
-A single-screen imitation of daily.dev's feed page:
 
 - **Top bar** — logo, search field with a `Ctrl + K` hint, icon buttons, level badge
   with a circular progress ring, and a reputation/currency strip.
