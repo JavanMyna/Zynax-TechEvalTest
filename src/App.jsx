@@ -3,8 +3,8 @@ import { useState } from 'react'
 
 const CATS = {
   profile: '/cats/miko1.png', 
-  squads: ['/cats/miko2.jpg', '/cats/miko3.jpg', '/cats/miko4.jpg'], 
-  feedback: ['/cats/miko2.jpg', '/cats/miko3.jpg', '/cats/miko4.jpg'], 
+  squads: ['/cats/miko2.jpg', '/cats/miko3.jpg', '/cats/miko5.jpg'], 
+  feedback: ['/cats/libra.jpg', '/cats/mango.jpg', '/cats/mita.jpg'], 
 }
 
 const USER_LEVEL = 8
