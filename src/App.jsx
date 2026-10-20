@@ -1,8 +1,18 @@
 // I sincerely did not do this part. I used claude. 
+import { useState } from 'react'
+
+const CATS = {
+  profile: '/cats/miko1.png', 
+  squads: ['/cats/miko2.jpg', '/cats/miko3.jpg', '/cats/miko4.jpg'], 
+  feedback: ['/cats/miko2.jpg', '/cats/miko3.jpg', '/cats/miko4.jpg'], 
+}
+
+const USER_LEVEL = 8
+const LEVEL_PROGRESS = 0.65 
 
 const tabs = ['For you', 'Web Development', 'PHP', 'GitHub']
 
-const sidebarIcons = ['➕', '👥', '👁️', '🔥', '🧪', '✨']
+const sidebarIcons = ['👥', '👁️', '🔥', '🧪', '✨']
 
 const news = [
   { title: 'Moonshot AI prepares to release Kimi K3, a 3-trillion-parameter open frontier model', time: '8m ago' },
@@ -13,6 +23,69 @@ const news = [
 
 const card = 'rounded-3xl border border-[#2a2e37] bg-[#1a1d24]'
 const outlined = 'rounded-xl border border-[#2a2e37] bg-[#161a21]'
+
+function Avatar({ src, alt = 'Cat', className = '', fallback = '🐱' }) {
+  const [failed, setFailed] = useState(false)
+
+  if (!src || failed) {
+    return (
+      <span role="img" aria-label={alt} className={`${className} grid shrink-0 place-items-center text-[0.9em] leading-none`}>
+        {fallback}
+      </span>
+    )
+  }
+  return (
+    <img
+      src={src}
+      alt={alt}
+      onError={() => setFailed(true)}
+      className={`${className} shrink-0 object-cover`}
+    />
+  )
+}
+
+function Logo() {
+  return (
+    <a href="#" className="flex items-center gap-2" aria-label="daily.dev">
+      <svg viewBox="0 0 40 24" className="h-6 w-10 text-white" fill="none" aria-hidden="true">
+        <path
+          d="M20 12 L27 4 H34 L38.5 12 L34 20 H27 L20 12 L13 4 H6 L1.5 12 L6 20 H13 Z"
+          stroke="currentColor"
+          strokeWidth="3"
+          strokeLinejoin="miter"
+          strokeMiterlimit="10"
+        />
+      </svg>
+      <span className="text-xl font-bold">
+        daily<span className="font-normal text-zinc-500">.dev</span>
+      </span>
+    </a>
+  )
+}
+
+function LevelBadge({ level, progress }) {
+  const r = 19
+  const circumference = 2 * Math.PI * r
+  return (
+    <div className="relative grid size-11 place-items-center rounded-full bg-[#161a21]" title={`Level ${level}`}>
+      <svg className="absolute inset-0 -rotate-90" viewBox="0 0 44 44" aria-hidden="true">
+        <circle cx="22" cy="22" r={r} fill="none" stroke="#2f343e" strokeWidth="3" />
+        <circle
+          cx="22"
+          cy="22"
+          r={r}
+          fill="none"
+          stroke="#a8b3cf"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={circumference * (1 - progress)}
+        />
+      </svg>
+      <span className="relative text-sm font-bold">{level}</span>
+    </div>
+  )
+}
 
 function IconButton({ children }) {
   return (
@@ -25,9 +98,7 @@ function IconButton({ children }) {
 function Navbar() {
   return (
     <header className="flex items-center gap-3 border-b border-[#2a2e37] px-4 py-3">
-      <span className="text-xl font-bold">
-        daily<span className="font-normal text-zinc-400">.dev</span>
-      </span>
+      <Logo />
 
       <div className="flex h-11 max-w-xl flex-1 items-center gap-3 rounded-xl bg-[#1a1d24] px-4 text-zinc-400">
         <span>🔍</span>
@@ -37,6 +108,7 @@ function Navbar() {
 
       <div className="ml-auto hidden items-center gap-3 sm:flex">
         <IconButton>💼</IconButton>
+        <LevelBadge level={USER_LEVEL} progress={LEVEL_PROGRESS} />
         <IconButton>🎁</IconButton>
         <IconButton>🔔</IconButton>
       </div>
@@ -45,7 +117,7 @@ function Navbar() {
         <span className="text-zinc-300">⭕ 0</span>
         <span className="text-yellow-400">◆ 1.1K</span>
         <span className="text-violet-400">⚡ 510</span>
-        <span className="size-9 rounded-lg bg-gradient-to-br from-sky-400 to-indigo-900" />
+        <Avatar src={CATS.profile} alt="Your profile" className="size-9 rounded-lg bg-gradient-to-br from-sky-400 to-indigo-900" />
       </div>
     </header>
   )
@@ -53,10 +125,33 @@ function Navbar() {
 
 function Sidebar() {
   return (
-    <aside className="hidden w-14 flex-col items-center gap-6 border-r border-[#2a2e37] py-4 md:flex">
+    <aside className="hidden w-14 shrink-0 flex-col items-center gap-5 overflow-y-auto border-r border-[#2a2e37] py-3 md:flex">
+      <button aria-label="Collapse sidebar" className="text-lg text-zinc-400 transition hover:text-white">
+        ◧
+      </button>
+
+      <button
+        aria-label="New post"
+        className="grid size-9 place-items-center rounded-xl bg-white text-2xl font-bold leading-none text-black transition hover:bg-zinc-200"
+      >
+        +
+      </button>
+
+      <button aria-label="Your profile" className="transition hover:opacity-80">
+        <Avatar src={CATS.profile} alt="Your profile" className="size-8 rounded-full bg-zinc-700" />
+      </button>
+
       {sidebarIcons.map((icon) => (
         <button key={icon} className="text-lg opacity-70 transition hover:opacity-100">
           {icon}
+        </button>
+      ))}
+
+      <div className="h-px w-8 bg-[#2a2e37]" />
+
+      {CATS.squads.map((src, i) => (
+        <button key={src} aria-label={`Squad ${i + 1}`} className="transition hover:opacity-80">
+          <Avatar src={src} alt={`Squad ${i + 1}`} className="size-7 rounded-full bg-zinc-700" />
         </button>
       ))}
     </aside>
@@ -152,9 +247,14 @@ function FeedbackButton() {
         <span className="block text-sm">Real people reply</span>
       </span>
       <span className="flex -space-x-2">
-        <span className="size-8 rounded-full border-2 border-white bg-amber-700" />
-        <span className="size-8 rounded-full border-2 border-white bg-indigo-700" />
-        <span className="size-8 rounded-full border-2 border-white bg-slate-500" />
+        {CATS.feedback.map((src, i) => (
+          <Avatar
+            key={src}
+            src={src}
+            alt={`Cat ${i + 1}`}
+            className="size-8 rounded-full border-2 border-white bg-amber-200"
+          />
+        ))}
       </span>
     </button>
   )
