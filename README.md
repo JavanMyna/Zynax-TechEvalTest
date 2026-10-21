@@ -1,4 +1,5 @@
 # Zynax — CSS Technical Evaluation
+Fredricko <.
 
 A front-end recreation of the [daily.dev](https://daily.dev) dashboard, built for the
 Computer Science Society (USM) technical evaluation.
