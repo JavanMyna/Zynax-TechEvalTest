@@ -1,5 +1,5 @@
 // I sincerely did not do this part. I used claude. 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const CATS = {
   profile: '/cats/miko1.png', 
@@ -95,9 +95,18 @@ function IconButton({ children }) {
   )
 }
 
-function Navbar() {
+function Navbar({ sidebarOpen, onToggleSidebar }) {
   return (
     <header className="flex items-center gap-3 border-b border-[#2a2e37] px-4 py-3">
+      <button
+        aria-label="Open sidebar"
+        aria-expanded={sidebarOpen}
+        aria-controls="sidebar"
+        onClick={onToggleSidebar}
+        className={`${outlined} grid size-11 shrink-0 place-items-center text-xl transition hover:border-zinc-500 md:hidden`}
+      >
+        ☰
+      </button>
       <Logo />
 
       <div className="flex h-11 max-w-xl flex-1 items-center gap-3 rounded-xl bg-[#1a1d24] px-4 text-zinc-400">
@@ -117,16 +126,25 @@ function Navbar() {
         <span className="text-zinc-300">⭕ 0</span>
         <span className="text-yellow-400">◆ 1.1K</span>
         <span className="text-violet-400">⚡ 510</span>
-        <Avatar src={CATS.profile} alt="Your profile" className="size-9 rounded-lg bg-gradient-to-br from-sky-400 to-indigo-900" />
+        <Avatar src={CATS.profile} alt="Your profile" className="size-9 rounded-lg bg-[#0e1217]" />
       </div>
     </header>
   )
 }
 
-function Sidebar() {
+function Sidebar({ open, onClose }) {
   return (
-    <aside className="hidden w-14 shrink-0 flex-col items-center gap-5 overflow-y-auto border-r border-[#2a2e37] py-3 md:flex">
-      <button aria-label="Collapse sidebar" className="text-lg text-zinc-400 transition hover:text-white">
+    <aside
+      id="sidebar"
+      className={`fixed inset-y-0 left-0 z-40 flex w-14 shrink-0 flex-col items-center gap-5 overflow-y-auto border-r border-[#2a2e37] bg-[#0e1217] py-3 transition-[transform,visibility] duration-200 md:visible md:static md:translate-x-0 ${
+        open ? 'visible translate-x-0' : 'invisible -translate-x-full'
+      }`}
+    >
+      <button
+        aria-label="Close sidebar"
+        onClick={onClose}
+        className="text-lg text-zinc-400 transition hover:text-white"
+      >
         ◧
       </button>
 
@@ -138,7 +156,7 @@ function Sidebar() {
       </button>
 
       <button aria-label="Your profile" className="transition hover:opacity-80">
-        <Avatar src={CATS.profile} alt="Your profile" className="size-8 rounded-full bg-zinc-700" />
+        <Avatar src={CATS.profile} alt="Your profile" className="size-8 rounded-full bg-[#0e1217]" />
       </button>
 
       {sidebarIcons.map((icon) => (
@@ -202,6 +220,113 @@ function HappeningNow() {
   )
 }
 
+function Icon({ children, filled = false }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="size-6"
+      fill={filled ? 'currentColor' : 'none'}
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinejoin="round"
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
+      {children}
+    </svg>
+  )
+}
+
+const UpvoteIcon = ({ filled }) => (
+  <Icon filled={filled}>
+    <path d="M12 3.5 3.5 13H9v7.5h6V13h5.5z" />
+  </Icon>
+)
+
+const DownvoteIcon = ({ filled }) => (
+  <Icon filled={filled}>
+    <path d="M12 20.5 3.5 11H9V3.5h6V11h5.5z" />
+  </Icon>
+)
+
+const CommentIcon = () => (
+  <Icon>
+    <path d="M21 12a8.5 8.5 0 0 1-12.2 7.6L3.5 21l1.4-4.9A8.5 8.5 0 1 1 21 12z" />
+  </Icon>
+)
+
+const BookmarkIcon = ({ filled }) => (
+  <Icon filled={filled}>
+    <path d="M6.5 3.5h11v17L12 16.5l-5.5 4z" />
+  </Icon>
+)
+
+function ActionButton({ label, onClick, pressed, active, hover, count, children }) {
+  return (
+    <button
+      aria-label={label}
+      aria-pressed={pressed}
+      onClick={onClick}
+      className={`flex items-center gap-2 rounded-xl px-3 py-2 font-bold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-white ${
+        pressed ? active : `text-slate-300 ${hover}`
+      }`}
+    >
+      {children}
+      {count !== undefined && <span className="min-w-[1.5ch] text-left">{count}</span>}
+    </button>
+  )
+}
+
+function PostActions({ upvotes, comments }) {
+  const [vote, setVote] = useState(null) // 'up' | 'down' | null
+  const [saved, setSaved] = useState(false)
+
+  const toggleVote = (next) => setVote((current) => (current === next ? null : next))
+
+  return (
+    <div className="mt-4 flex items-center justify-between">
+      <ActionButton
+        label="Upvote"
+        pressed={vote === 'up'}
+        onClick={() => toggleVote('up')}
+        active="bg-lime-400/15 text-lime-300"
+        hover="hover:bg-lime-400/10 hover:text-lime-300"
+        count={upvotes + (vote === 'up' ? 1 : 0)}
+      >
+        <UpvoteIcon filled={vote === 'up'} />
+      </ActionButton>
+
+      <ActionButton
+        label="Downvote"
+        pressed={vote === 'down'}
+        onClick={() => toggleVote('down')}
+        active="bg-red-500/15 text-red-400"
+        hover="hover:bg-red-500/10 hover:text-red-400"
+      >
+        <DownvoteIcon filled={vote === 'down'} />
+      </ActionButton>
+
+      <ActionButton
+        label="Comments"
+        hover="hover:bg-sky-400/10 hover:text-sky-300"
+        count={comments}
+      >
+        <CommentIcon />
+      </ActionButton>
+
+      <ActionButton
+        label={saved ? 'Remove bookmark' : 'Bookmark'}
+        pressed={saved}
+        onClick={() => setSaved((s) => !s)}
+        active="bg-orange-400/15 text-orange-300"
+        hover="hover:bg-orange-400/10 hover:text-orange-300"
+      >
+        <BookmarkIcon filled={saved} />
+      </ActionButton>
+    </div>
+  )
+}
+
 function ArticleCard() {
   return (
     <article className={`${card} p-5`}>
@@ -229,12 +354,7 @@ function ArticleCard() {
         </div>
       </div>
 
-      <div className="mt-4 flex justify-between text-slate-300">
-        <span>⬆️ 73</span>
-        <span>⬇️</span>
-        <span>💬 12</span>
-        <span>🔖</span>
-      </div>
+      <PostActions upvotes={73} comments={12} />
     </article>
   )
 }
@@ -261,11 +381,27 @@ function FeedbackButton() {
 }
 
 function App() {
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  useEffect(() => {
+    if (!sidebarOpen) return
+    const onKeyDown = (e) => e.key === 'Escape' && setSidebarOpen(false)
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [sidebarOpen])
+
   return (
     <div className="flex h-screen flex-col bg-[#0e1217] text-white">
-      <Navbar />
+      <Navbar sidebarOpen={sidebarOpen} onToggleSidebar={() => setSidebarOpen((o) => !o)} />
       <div className="flex min-h-0 flex-1">
-        <Sidebar />
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 z-30 bg-black/60 md:hidden"
+            onClick={() => setSidebarOpen(false)}
+            aria-hidden="true"
+          />
+        )}
+        <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
           <FeedTabs />
           <div className="mt-6 grid gap-6 lg:grid-cols-2">
